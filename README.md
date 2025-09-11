@@ -1,2 +1,2 @@
-# pose-audio
+# Pose-audio
 Another Hubert and Nadia's secret project :)

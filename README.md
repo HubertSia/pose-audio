@@ -21,7 +21,7 @@ Here are the different classification poses:
  - Idle
  - None
  
- The model was trained on 210 images per classes for both the main classification and the extra.
+ The model was trained on 60-120 images per classes for both the main classification and the extra.
  
  Here is the live version online: https://hubertsia.github.io/pose-audio/
  

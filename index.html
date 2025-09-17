@@ -4,15 +4,84 @@
 <div id="label-container"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+<script src="https://unpkg.com/tone"></script>
 <script type="text/javascript">
     // More API functions here:
     // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
 
     // the link to your model provided by Teachable Machine export panel
-    const URL = "./human-pose/";
-    let model, webcam, ctx, labelContainer, maxPredictions;
+    const URL = "https://teachablemachine.withgoogle.com/models/JZjwaEnza/";
+    let model, webcam, ctx, labelContainer, maxPredictions, synths, noiseSynth;
 
     async function init() {
+        await Tone.start();
+
+        // Effects chain for a massive supersaw
+        const reverb = new Tone.Reverb({
+            decay: 2.5,
+            preDelay: 0.01
+        }).toDestination();
+
+        const delay = new Tone.FeedbackDelay("8n", 0.5).connect(reverb);
+        const widener = new Tone.StereoWidener(0.8).connect(delay);
+
+        // Atmospheric supersaw synths for chords
+        const numVoices = 3;
+        synths = [];
+        for (let i = 0; i < numVoices; i++) {
+            const synth = new Tone.MonoSynth({
+                oscillator: {
+                    type: "fatsawtooth",
+                    count: 8,
+                    spread: 60
+                },
+                envelope: {
+                    attack: 0.4,
+                    release: 0.8
+                },
+                portamento: 0.2 // Increased for more slide
+            }).connect(widener);
+            synth.triggerAttack("C4");
+            synth.volume.value = -Infinity; // Start muted
+            synths.push(synth);
+        }
+
+        // Noise layer
+        noiseSynth = new Tone.NoiseSynth({
+            noise: {
+                type: 'pink'
+            },
+            envelope: {
+                attack: 0.8,
+                release: 0.4
+            }
+        }).connect(delay);
+        noiseSynth.triggerAttack();
+        noiseSynth.volume.value = -Infinity; // Start muted
+
+        const synth = new Tone.MonoSynth({
+            oscillator: {
+                type: "sine"
+            },
+            envelope: {
+                attack: 1,
+                release: 1
+            },
+            filter: {
+                type: "lowpass",
+                frequency: 2000,
+                rolloff: -12
+            },
+            filterEnvelope: {
+                attack: 0.5,
+                baseFrequency: 400,
+                octaves: 2
+            }
+        }).connect(widener);
+        synth.volume.value = -24; // Lowered volume
+        synth.triggerAttack("C2");
+        synths.push(synth);
+
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
@@ -53,6 +122,35 @@
         // Prediction 2: run input through teachable machine classification model
         const prediction = await model.predict(posenetOutput);
 
+        const chords = [
+            ["C4", "E4", "G4"],
+            ["D4", "F4", "A4"],
+            ["E4", "G4", "B4"],
+            ["F4", "A4", "C5"],
+            null
+        ];
+        let bestPose = 0;
+        for (let i = 1; i < maxPredictions; i++) {
+            if (prediction[i].probability > prediction[bestPose].probability) {
+                bestPose = i;
+            }
+        }
+
+        const chord = prediction[bestPose].probability > 0.9 && bestPose < 4 ? chords[bestPose] : null;
+
+        if (chord) {
+            synths.forEach(synth => synth.volume.rampTo(0, 0.1)); // Unmute supersaw
+            noiseSynth.volume.rampTo(-20, 0.1); // Unmute noise layer (quieter)
+            for (let i = 0; i < synths.length; i++) {
+                if (chord[i]) {
+                    synths[i].setNote(chord[i]);
+                }
+            }
+        } else {
+            synths.forEach(synth => synth.volume.rampTo(-Infinity, 0.5)); // Mute supersaw
+            noiseSynth.volume.rampTo(-Infinity, 0.5); // Mute noise layer
+        }
+
         for (let i = 0; i < maxPredictions; i++) {
             const classPrediction =
                 prediction[i].className + ": " + prediction[i].probability.toFixed(2);
@@ -74,4 +172,8 @@
             }
         }
     }
+
+
+
+
 </script>

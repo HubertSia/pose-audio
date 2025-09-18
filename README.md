@@ -12,20 +12,13 @@ For this project is a combination of both ML and Tone.js for achieving the music
 
 Here are the different body position classification poses:
 
-- T-Pose
-Both arms up
-- Left arm up
-Left arm up (palm facing towards the camera)
-- Right arm 
-Right arm up
-- Squat
-Bending the body or lowering the level when standing
-- Idle
-sitting or standing normally
-- None
-Absent
-- Hidden
-Covering the face with one hand
+- T-Pose - Both arms up
+- Left arm up - Left arm up (palm facing towards the camera)
+- Right arm - Right arm up
+- Squat - Bending the body or lowering the level when standing
+- Idle - sitting or standing normally
+- None - Absent
+- Hidden - Covering the face with one hand
 
 The model was trained on custom data from the webcam, as we were committed to not using external data, using between 54-300 images/examples per class in order to get the desirable results, several versions exist. We left all meta-parameters at defaults. 
 

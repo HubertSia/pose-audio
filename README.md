@@ -10,27 +10,29 @@ We created on our own dataset by scanning our own pictures through https://teach
 
 For this project is a combination of both ML and Tone.js for achieving the musical project.
 
-Here are the different classification poses:
+Here are the different body position classification poses:
 
 - T-Pose
+Both arms up
 - Left arm up
-- Right arm up
+Left arm up (palm facing towards the camera)
+- Right arm 
+Right arm up
 - Squat
+Bending the body or lowering the level when standing
 - Idle
+sitting or standing normally
 - None
+Absent
 - Hidden
+Covering the face with one hand
 
-The model was trained between 54-300 images/examples per classes in order to get the desirable results.
+The model was trained on custom data from the webcam, as we were committed to not using external data, using between 54-300 images/examples per class in order to get the desirable results, several versions exist. We left all meta-parameters at defaults. 
 
+Our strategy of developping the ML is too make sure we have a clear shot of the subject without any obstacles that could jeoperdize the pictures. 
 
-Our strategy of developping the ML is too make sure we have a clear shot of the webcome of our poses without any obstacle that could jeoperdized the pictures. Making sure that the webcam has a full image of the body and hand.
+It suffers is that depending on the lighting and the environnment, the detection struggles with background changes specifically as it misclassifies empty rooms into pose classes.
 
-Some of the flaws it suffers is that depending on the lighting and the environnment, the detection might be working sometimes but in a 100% rate that we initially thought.
-
-T-Pose and Squat are the must difficult to capture due to them being a bit more complex to capture and required more pictures and data in order to succeded. Even None and Hidden has some difficulty to recognize too as well. At the end, it need it more data/pictures and making sure that we were somehow isolated to get it right
-
-It was quite a challenge to achieve good performance due on how diffirent  the human being bodies are, it was quite difficult for the ML to learn it at a snap. 
-
-Initally, 
+T-Pose and Squat are difficult to capture due to them being complex and farther from the camera. None and Hidden have some overlap as well a hidden is an incredibly narrow dataset. We are open to further explorations within this project, and regret not having the opportunity to refine the outcome further within the given timeframe.
 
 Here is the live version online: https://hubertsia.github.io/pose-audio/
